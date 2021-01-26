@@ -1,14 +1,24 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"go-wall/unsplash"
+	"log"
 
 	"github.com/reujab/wallpaper"
 	"github.com/spf13/viper"
 )
 
+func getQuery() string {
+	query := flag.String("q", "", "Query for unsplash photos")
+	flag.Parse()
+	return *query
+}
+
 func main() {
+	query := getQuery()
+	log.Printf("Query : %#v", query)
 	viper.SetConfigName("configs")
 	viper.SetConfigType("json")
 	viper.AddConfigPath("./configs")
@@ -23,7 +33,7 @@ func main() {
 		MaxTimeout: viper.GetInt("MaxTimeout"),
 		Retry:      viper.GetInt("Retry"),
 	}
-	p, err := un.SearchPhotos(viper.GetString("query"), viper.GetInt("Page"), viper.GetInt("PerPage"), viper.GetString("Orientation"))
+	p, err := un.SearchPhotos(query, viper.GetInt("Page"), viper.GetInt("PerPage"), viper.GetString("Orientation"))
 	if err != nil {
 		panic(fmt.Errorf("Error in getting images from unsplash -> %v\n", err))
 	}
