@@ -2,9 +2,10 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"go-wall/unsplash"
 	"log"
+	"math/rand"
+	"time"
 
 	"github.com/reujab/wallpaper"
 	"github.com/spf13/viper"
@@ -16,6 +17,11 @@ func getQuery() string {
 	return *query
 }
 
+func getRandomPhoto(photos []unsplash.Photo) unsplash.Photo {
+	rand.Seed(time.Now().UnixNano())
+	return photos[rand.Intn(len(photos))] // #nosec
+}
+
 func main() {
 	query := getQuery()
 	log.Printf("Query : %#v", query)
@@ -24,7 +30,7 @@ func main() {
 	viper.AddConfigPath("./configs")
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic(fmt.Errorf("Error in reading config file -> %v\n", err))
+		log.Fatalf("Error in reading config file -> %v\n", err)
 	}
 	un := unsplash.Unsplash{
 		BaseURL:    viper.GetString("BaseURL"),
@@ -35,11 +41,12 @@ func main() {
 	}
 	p, err := un.SearchPhotos(query, viper.GetInt("Page"), viper.GetInt("PerPage"), viper.GetString("Orientation"))
 	if err != nil {
-		panic(fmt.Errorf("Error in getting images from unsplash -> %v\n", err))
+		log.Fatalf("Error in getting images from unsplash -> %v\n", err)
 	}
-	u := p[0].URL.Raw
+	randomPhoto := getRandomPhoto(p)
+	u := randomPhoto.URL.Raw
 	err = wallpaper.SetFromURL(u)
 	if err != nil {
-		panic(fmt.Errorf("Error in setting wallpaper -> %v\n", err))
+		log.Fatalf("Error in setting wallpaper -> %v\n", err)
 	}
 }
