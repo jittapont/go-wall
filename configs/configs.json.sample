@@ -4,7 +4,6 @@
     "MinTimeout": 10,
     "MaxTimeout": 60,
     "Retry": 3,
-    "Query": "india",
     "Page": 1,
     "PerPage": 100,
     "Orientation": "landscape"
