@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"path"
 	"strconv"
+	"time"
 )
 
 type GetPhotosResponse struct {
@@ -44,8 +45,8 @@ type Photo struct {
 type Unsplash struct {
 	BaseURL    string
 	AccessKey  string
-	MinTimeout int
-	MaxTimeout int
+	MinTimeout time.Duration
+	MaxTimeout time.Duration
 	Retry      int
 }
 

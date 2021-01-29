@@ -1,8 +1,8 @@
 {
     "BaseURL": "https://api.unsplash.com",
     "AccessKey": "token",
-    "MinTimeout": 10,
-    "MaxTimeout": 60,
+    "MinTimeout": "10s",
+    "MaxTimeout": "60s",
     "Retry": 3,
     "Page": 1,
     "PerPage": 100,

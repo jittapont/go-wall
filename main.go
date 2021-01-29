@@ -35,8 +35,8 @@ func main() {
 	un := unsplash.Unsplash{
 		BaseURL:    viper.GetString("BaseURL"),
 		AccessKey:  viper.GetString("AccessKey"),
-		MinTimeout: viper.GetInt("MinTimeout"),
-		MaxTimeout: viper.GetInt("MaxTimeout"),
+		MinTimeout: viper.GetDuration("MinTimeout"),
+		MaxTimeout: viper.GetDuration("MaxTimeout"),
 		Retry:      viper.GetInt("Retry"),
 	}
 	p, err := un.SearchPhotos(query, viper.GetInt("Page"), viper.GetInt("PerPage"), viper.GetString("Orientation"))

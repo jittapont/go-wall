@@ -8,10 +8,10 @@ import (
 	"github.com/hashicorp/go-retryablehttp"
 )
 
-func newClient(minTimeout, maxTimeout, retry int) (*retryablehttp.Client, error) {
+func newClient(minTimeout, maxTimeout time.Duration, retry int) (*retryablehttp.Client, error) {
 	c := retryablehttp.NewClient()
-	c.RetryWaitMin = time.Duration(minTimeout) * time.Second
-	c.RetryWaitMax = time.Duration(maxTimeout) * time.Second
+	c.RetryWaitMin = minTimeout
+	c.RetryWaitMax = maxTimeout
 	c.RetryMax = retry
 	return c, nil
 }
