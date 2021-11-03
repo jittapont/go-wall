@@ -90,3 +90,45 @@ func (unsplash *Unsplash) SearchPhotos(query string, page, perPage int, orientat
 	}
 	return result.Photos, nil
 }
+
+func (unsplash *Unsplash) GetRandomPhoto() (Photo, error) {
+	u, err := url.Parse(unsplash.BaseURL)
+	if err != nil {
+		return Photo{}, err
+	}
+
+	u.Path = path.Join(u.Path, "photos", "random")
+
+	client, err := newClient(unsplash.MinTimeout, unsplash.MaxTimeout, unsplash.Retry)
+	if err != nil {
+		return Photo{}, err
+	}
+
+	h := http.Header{
+		"Authorization": []string{fmt.Sprintf("Client-ID %v", unsplash.AccessKey)},
+	}
+
+	req, err := newRequest(u, "GET", h)
+	if err != nil {
+		return Photo{}, err
+	}
+
+	q := req.URL.Query()
+	q.Add("orientation", "landscape")
+	q.Add("content_filter", "high")
+
+	req.URL.RawQuery = q.Encode()
+	res, err := client.Do(req)
+	if err != nil {
+		return Photo{}, err
+	}
+	defer res.Body.Close()
+
+	var p Photo
+	err = json.NewDecoder(res.Body).Decode(&p)
+	if err != nil {
+		return Photo{}, err
+	}
+
+	return p, nil
+}

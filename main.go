@@ -23,8 +23,6 @@ func getRandomPhoto(photos []unsplash.Photo) unsplash.Photo {
 }
 
 func main() {
-	query := getQuery()
-	log.Printf("Query : %#v", query)
 	viper.SetConfigName("configs")
 	viper.SetConfigType("json")
 	viper.AddConfigPath("./configs")
@@ -32,6 +30,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error in reading config file -> %v\n", err)
 	}
+
 	un := unsplash.Unsplash{
 		BaseURL:    viper.GetString("BaseURL"),
 		AccessKey:  viper.GetString("AccessKey"),
@@ -39,14 +38,14 @@ func main() {
 		MaxTimeout: viper.GetDuration("MaxTimeout"),
 		Retry:      viper.GetInt("Retry"),
 	}
-	p, err := un.SearchPhotos(query, viper.GetInt("Page"), viper.GetInt("PerPage"), viper.GetString("Orientation"))
+
+	p, err := un.GetRandomPhoto()
 	if err != nil {
-		log.Fatalf("Error in getting images from unsplash -> %v\n", err)
+		log.Fatalf("error in getting images from unsplash: %s\n", err.Error())
 	}
-	randomPhoto := getRandomPhoto(p)
-	u := randomPhoto.URL.Raw
-	err = wallpaper.SetFromURL(u)
+
+	err = wallpaper.SetFromURL(p.URL.Raw)
 	if err != nil {
-		log.Fatalf("Error in setting wallpaper -> %v\n", err)
+		log.Fatalf("error in setting wallpaper: %s\n", err.Error())
 	}
 }
