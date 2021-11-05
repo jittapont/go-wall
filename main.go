@@ -1,10 +1,16 @@
 package main
 
 import (
+	"errors"
 	"flag"
+	"fmt"
 	"go-wall/unsplash"
+	"io"
 	"log"
 	"math/rand"
+	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/reujab/wallpaper"
@@ -20,6 +26,37 @@ func getQuery() string {
 func getRandomPhoto(photos []unsplash.Photo) unsplash.Photo {
 	rand.Seed(time.Now().UnixNano())
 	return photos[rand.Intn(len(photos))] // #nosec
+}
+
+func savePhoto(outputDir, link string) error {
+	rand.Seed(time.Now().UnixNano())
+	res, err := http.Get(link)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode < 200 || res.StatusCode >= 300 {
+		return errors.New("non-200 status code")
+	}
+
+	file := filepath.Join(outputDir, "wallpaper", fmt.Sprintf("%v.jpeg", rand.Intn(100000)))
+	if err := os.MkdirAll(filepath.Dir(file), 0775); err != nil {
+		return err
+	}
+
+	fd, err := os.Create(file)
+	if err != nil {
+		return err
+	}
+	defer fd.Close()
+
+	_, err = io.Copy(fd, res.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func main() {
@@ -48,4 +85,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("error in setting wallpaper: %s\n", err.Error())
 	}
+
+	err = savePhoto("", p.URL.Raw)
+	if err != nil {
+		log.Fatalf("error in saving wallpaper: %s\n", err.Error())
+	}
+
 }
