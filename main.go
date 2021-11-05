@@ -13,8 +13,9 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/joho/godotenv"
+	"github.com/kelseyhightower/envconfig"
 	"github.com/reujab/wallpaper"
-	"github.com/spf13/viper"
 )
 
 func getQuery() string {
@@ -59,21 +60,32 @@ func savePhoto(outputDir, link string) error {
 	return nil
 }
 
+type config struct {
+	BaseURL    string        `required:"true" split_words:"true" default:"https://api.unsplash.com"`
+	AccessKey  string        `required:"true" split_words:"true"`
+	MinTimeout time.Duration `required:"true" split_words:"true" default:"10s"`
+	MaxTimeout time.Duration `required:"true" split_words:"true" default:"30s"`
+	Retry      int           `required:"true" split_words:"true" default:"3"`
+}
+
 func main() {
-	viper.SetConfigName("configs")
-	viper.SetConfigType("json")
-	viper.AddConfigPath("./configs")
-	err := viper.ReadInConfig()
+	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("Error in reading config file -> %v\n", err)
+		log.Fatalf("error in reading env file: %s\n", err.Error())
+	}
+
+	var conf config
+	err = envconfig.Process("", &conf)
+	if err != nil {
+		log.Fatalf("error in reading config file: %s\n", err.Error())
 	}
 
 	un := unsplash.Unsplash{
-		BaseURL:    viper.GetString("BaseURL"),
-		AccessKey:  viper.GetString("AccessKey"),
-		MinTimeout: viper.GetDuration("MinTimeout"),
-		MaxTimeout: viper.GetDuration("MaxTimeout"),
-		Retry:      viper.GetInt("Retry"),
+		BaseURL:    conf.BaseURL,
+		AccessKey:  conf.AccessKey,
+		MinTimeout: conf.MinTimeout,
+		MaxTimeout: conf.MaxTimeout,
+		Retry:      conf.Retry,
 	}
 
 	p, err := un.GetRandomPhoto()

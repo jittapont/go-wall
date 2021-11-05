@@ -1,6 +1,5 @@
 wallpaper/
-*.json
-go-wall.exe
+*.env
 # Created by https://www.toptal.com/developers/gitignore/api/vim,go,intellij+all
 # Edit at https://www.toptal.com/developers/gitignore?templates=vim,go,intellij+all
 
