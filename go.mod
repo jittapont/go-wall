@@ -7,6 +7,7 @@ require (
 	github.com/joho/godotenv v1.4.0
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/kr/pretty v0.1.0 // indirect
+	github.com/micmonay/keybd_event v1.1.1
 	github.com/reujab/wallpaper v0.0.0-20201124162023-c3898ec30d2c
 	github.com/smartystreets/goconvey v1.6.4 // indirect
 	github.com/stretchr/testify v1.3.0 // indirect

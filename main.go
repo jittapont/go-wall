@@ -11,10 +11,12 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/micmonay/keybd_event"
 	"github.com/reujab/wallpaper"
 )
 
@@ -60,6 +62,26 @@ func savePhoto(outputDir, link string) error {
 	return nil
 }
 
+func closeVirtualDesktops() error {
+	kb, err := keybd_event.NewKeyBonding()
+	if err != nil {
+		return err
+	}
+
+	kb.HasSuper(true)
+	kb.HasCTRL(true)
+	kb.SetKeys(keybd_event.VK_F4)
+
+	for i := 0; i < 100; i++ {
+		err = kb.Launching()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 type config struct {
 	BaseURL    string        `required:"true" split_words:"true" default:"https://api.unsplash.com"`
 	AccessKey  string        `required:"true" split_words:"true"`
@@ -93,6 +115,12 @@ func main() {
 		log.Fatalf("error in getting images from unsplash: %s\n", err.Error())
 	}
 
+	if runtime.GOOS == "windows" {
+		if err := closeVirtualDesktops(); err != nil {
+			log.Printf("error in closing virtual desktops: %s\n", err)
+		}
+	}
+
 	err = wallpaper.SetFromURL(p.URL.Raw)
 	if err != nil {
 		log.Fatalf("error in setting wallpaper: %s\n", err.Error())
@@ -102,5 +130,4 @@ func main() {
 	if err != nil {
 		log.Fatalf("error in saving wallpaper: %s\n", err.Error())
 	}
-
 }
